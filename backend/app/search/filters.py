@@ -21,6 +21,7 @@ class SearchCriteria:
     budget_max: float | None = None
     possession_before: str | None = None  # "YYYY-MM", inclusive upper bound
     required_amenities: list[str] = field(default_factory=list)
+    locality: str | None = None          # exact locality/location name match
 
     # Hard commute/proximity constraint, e.g. "must be within 45 min of Koramangala".
     reference_lat: float | None = None
@@ -45,6 +46,9 @@ def matches(prop: dict, criteria: SearchCriteria) -> bool:
         return False
 
     if criteria.possession_before is not None and prop["possession"] > criteria.possession_before:
+        return False
+
+    if criteria.locality and prop["location"].lower() != criteria.locality.lower():
         return False
 
     if criteria.required_amenities:

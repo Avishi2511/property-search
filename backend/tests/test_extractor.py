@@ -46,6 +46,17 @@ def test_extract_office_location():
     assert updates["office_location"].value == "Koramangala"
 
 
+def test_office_location_not_misread_as_buyer_locality():
+    """Regression: mentioning a place only as someone else's office must not
+    also set the buyer's own desired `locality` to that same place."""
+    profile = create_profile("demo-user")
+    updates = _updates_by_field(
+        extract("My wife's office is in Koramangala, but my parents will live with us", profile)
+    )
+    assert updates["office_location"].value == "Koramangala"
+    assert "locality" not in updates
+
+
 def test_extract_hospital_over_commute_priority():
     profile = create_profile("demo-user")
     updates = _updates_by_field(
@@ -112,6 +123,20 @@ def test_extract_amenities():
     profile = create_profile("demo-user")
     updates = _updates_by_field(extract("A swimming pool and a gym would be nice", profile))
     assert set(updates["amenities"].value) == {"pool", "gym"}
+
+
+def test_extract_amenities_does_not_false_positive_on_parking():
+    """Regression: 'park' as an amenity keyword must not substring-match inside 'parking'."""
+    profile = create_profile("demo-user")
+    updates = _updates_by_field(extract("I need dedicated parking", profile))
+    assert "amenities" not in updates
+    assert updates["parking"].value is True
+
+
+def test_extract_parking_with_intervening_word():
+    profile = create_profile("demo-user")
+    updates = _updates_by_field(extract("I need dedicated parking", profile))
+    assert updates["parking"].value is True
 
 
 def test_extract_no_matches_returns_empty_for_irrelevant_text():

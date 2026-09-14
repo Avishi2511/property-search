@@ -57,7 +57,10 @@ _HOSPITAL_OVER_COMMUTE_RE = re.compile(
     r"hospitals?.{0,20}(?:more important|priority).{0,20}(?:than).{0,20}commute", re.IGNORECASE
 )
 
-_PARKING_YES_RE = re.compile(r"need(?:s)? parking|with parking|parking is (?:a must|important|needed)", re.IGNORECASE)
+_PARKING_YES_RE = re.compile(
+    r"need(?:s)?\s+(?:a\s+|dedicated\s+)?parking|with parking|parking is (?:a must|important|needed)",
+    re.IGNORECASE,
+)
 _PARKING_NO_RE = re.compile(r"don'?t need parking|no parking needed|parking (?:doesn'?t|isn'?t) matter", re.IGNORECASE)
 
 _AMENITY_KEYWORDS = {
@@ -127,6 +130,19 @@ def _rule_based_updates(utterance: str, profile: BuyerProfile) -> list[Constrain
                                          type="soft" if mention.approx else "hard",
                                          is_correction=is_correction))
 
+    # Resolve office-location mentions first so a place named only as "my
+    # wife's office is in X" isn't also picked up as the buyer's own
+    # desired locality below.
+    office_match = _OFFICE_RE.search(utterance)
+    if office_match:
+        raw_place = office_match.group(1).strip()
+        canonical = _match_locality(raw_place) or raw_place.title()
+        updates.append(ConstraintUpdate(field="office_location", value=canonical, confidence=0.88, type="context"))
+        start, end = office_match.span(1)
+        locality_search_text = utterance[:start] + " " + utterance[end:]
+    else:
+        locality_search_text = utterance
+
     within_match = _WITHIN_MINUTES_OF_RE.search(utterance)
     if within_match:
         minutes, place = int(within_match.group(1)), within_match.group(2).strip()
@@ -136,7 +152,7 @@ def _rule_based_updates(utterance: str, profile: BuyerProfile) -> list[Constrain
             confidence=0.85, type="soft", is_correction=True,  # this phrasing is almost always a relaxation/correction
         ))
     else:
-        locality = _match_locality(utterance)
+        locality = _match_locality(locality_search_text)
         if locality:
             updates.append(ConstraintUpdate(field="locality", value=locality, confidence=0.9, type="soft",
                                              is_correction=is_correction))
@@ -148,12 +164,6 @@ def _rule_based_updates(utterance: str, profile: BuyerProfile) -> list[Constrain
 
     if _PARENTS_RE.search(utterance):
         updates.append(ConstraintUpdate(field="parents_living_with_buyer", value=True, confidence=0.9, type="context"))
-
-    office_match = _OFFICE_RE.search(utterance)
-    if office_match:
-        raw_place = office_match.group(1).strip()
-        canonical = _match_locality(raw_place) or raw_place.title()
-        updates.append(ConstraintUpdate(field="office_location", value=canonical, confidence=0.88, type="context"))
 
     if _HOSPITAL_OVER_COMMUTE_RE.search(utterance):
         updates.append(ConstraintUpdate(field="hospital_access", value="high", confidence=0.85, type="preference"))
@@ -173,7 +183,7 @@ def _rule_based_updates(utterance: str, profile: BuyerProfile) -> list[Constrain
 
     found_amenities = [
         canonical for canonical, keywords in _AMENITY_KEYWORDS.items()
-        if any(kw in lowered for kw in keywords)
+        if any(re.search(rf"\b{re.escape(kw)}\b", lowered) for kw in keywords)
     ]
     if found_amenities:
         updates.append(ConstraintUpdate(field="amenities", value=found_amenities, confidence=0.85, type="preference"))
