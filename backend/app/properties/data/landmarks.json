@@ -1,0 +1,866 @@
+[
+  {
+    "id": "landmark_001",
+    "name": "Koramangala General Hospital",
+    "category": "hospital",
+    "location": "Koramangala",
+    "latitude": 12.921357,
+    "longitude": 77.630387
+  },
+  {
+    "id": "landmark_002",
+    "name": "Koramangala Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Koramangala",
+    "latitude": 12.924518,
+    "longitude": 77.623376
+  },
+  {
+    "id": "landmark_003",
+    "name": "Koramangala Public School",
+    "category": "school",
+    "location": "Koramangala",
+    "latitude": 12.940349,
+    "longitude": 77.633289
+  },
+  {
+    "id": "landmark_004",
+    "name": "Koramangala Metro Station",
+    "category": "metro",
+    "location": "Koramangala",
+    "latitude": 12.933796,
+    "longitude": 77.624448
+  },
+  {
+    "id": "landmark_005",
+    "name": "Koramangala Tech Park",
+    "category": "office_hub",
+    "location": "Koramangala",
+    "latitude": 12.920775,
+    "longitude": 77.622472
+  },
+  {
+    "id": "landmark_006",
+    "name": "Koramangala Central Mall",
+    "category": "mall",
+    "location": "Koramangala",
+    "latitude": 12.931371,
+    "longitude": 77.635069
+  },
+  {
+    "id": "landmark_007",
+    "name": "Indiranagar General Hospital",
+    "category": "hospital",
+    "location": "Indiranagar",
+    "latitude": 12.97331,
+    "longitude": 77.64886
+  },
+  {
+    "id": "landmark_008",
+    "name": "Indiranagar Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Indiranagar",
+    "latitude": 12.969922,
+    "longitude": 77.631486
+  },
+  {
+    "id": "landmark_009",
+    "name": "Indiranagar Public School",
+    "category": "school",
+    "location": "Indiranagar",
+    "latitude": 12.982426,
+    "longitude": 77.650807
+  },
+  {
+    "id": "landmark_010",
+    "name": "Indiranagar Metro Station",
+    "category": "metro",
+    "location": "Indiranagar",
+    "latitude": 12.968176,
+    "longitude": 77.629072
+  },
+  {
+    "id": "landmark_011",
+    "name": "Indiranagar Tech Park",
+    "category": "office_hub",
+    "location": "Indiranagar",
+    "latitude": 12.972273,
+    "longitude": 77.641079
+  },
+  {
+    "id": "landmark_012",
+    "name": "Indiranagar Central Mall",
+    "category": "mall",
+    "location": "Indiranagar",
+    "latitude": 12.980069,
+    "longitude": 77.644117
+  },
+  {
+    "id": "landmark_013",
+    "name": "HSR Layout General Hospital",
+    "category": "hospital",
+    "location": "HSR Layout",
+    "latitude": 12.9123,
+    "longitude": 77.646855
+  },
+  {
+    "id": "landmark_014",
+    "name": "HSR Layout Multispecialty Hospital",
+    "category": "hospital",
+    "location": "HSR Layout",
+    "latitude": 12.908408,
+    "longitude": 77.631068
+  },
+  {
+    "id": "landmark_015",
+    "name": "HSR Layout Public School",
+    "category": "school",
+    "location": "HSR Layout",
+    "latitude": 12.898936,
+    "longitude": 77.657857
+  },
+  {
+    "id": "landmark_016",
+    "name": "HSR Layout Metro Station",
+    "category": "metro",
+    "location": "HSR Layout",
+    "latitude": 12.922273,
+    "longitude": 77.638485
+  },
+  {
+    "id": "landmark_017",
+    "name": "HSR Layout Tech Park",
+    "category": "office_hub",
+    "location": "HSR Layout",
+    "latitude": 12.923763,
+    "longitude": 77.645268
+  },
+  {
+    "id": "landmark_018",
+    "name": "HSR Layout Central Mall",
+    "category": "mall",
+    "location": "HSR Layout",
+    "latitude": 12.900191,
+    "longitude": 77.655271
+  },
+  {
+    "id": "landmark_019",
+    "name": "Whitefield General Hospital",
+    "category": "hospital",
+    "location": "Whitefield",
+    "latitude": 12.972331,
+    "longitude": 77.762984
+  },
+  {
+    "id": "landmark_020",
+    "name": "Whitefield Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Whitefield",
+    "latitude": 12.975178,
+    "longitude": 77.737823
+  },
+  {
+    "id": "landmark_021",
+    "name": "Whitefield Public School",
+    "category": "school",
+    "location": "Whitefield",
+    "latitude": 12.973482,
+    "longitude": 77.758607
+  },
+  {
+    "id": "landmark_022",
+    "name": "Whitefield Metro Station",
+    "category": "metro",
+    "location": "Whitefield",
+    "latitude": 12.981767,
+    "longitude": 77.744938
+  },
+  {
+    "id": "landmark_023",
+    "name": "Whitefield Tech Park",
+    "category": "office_hub",
+    "location": "Whitefield",
+    "latitude": 12.970667,
+    "longitude": 77.756035
+  },
+  {
+    "id": "landmark_024",
+    "name": "Whitefield Central Mall",
+    "category": "mall",
+    "location": "Whitefield",
+    "latitude": 12.959805,
+    "longitude": 77.760451
+  },
+  {
+    "id": "landmark_025",
+    "name": "Marathahalli General Hospital",
+    "category": "hospital",
+    "location": "Marathahalli",
+    "latitude": 12.965326,
+    "longitude": 77.687603
+  },
+  {
+    "id": "landmark_026",
+    "name": "Marathahalli Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Marathahalli",
+    "latitude": 12.959642,
+    "longitude": 77.697142
+  },
+  {
+    "id": "landmark_027",
+    "name": "Marathahalli Public School",
+    "category": "school",
+    "location": "Marathahalli",
+    "latitude": 12.94748,
+    "longitude": 77.704234
+  },
+  {
+    "id": "landmark_028",
+    "name": "Marathahalli Metro Station",
+    "category": "metro",
+    "location": "Marathahalli",
+    "latitude": 12.970975,
+    "longitude": 77.702659
+  },
+  {
+    "id": "landmark_029",
+    "name": "Marathahalli Tech Park",
+    "category": "office_hub",
+    "location": "Marathahalli",
+    "latitude": 12.945299,
+    "longitude": 77.700948
+  },
+  {
+    "id": "landmark_030",
+    "name": "Marathahalli Central Mall",
+    "category": "mall",
+    "location": "Marathahalli",
+    "latitude": 12.965274,
+    "longitude": 77.714757
+  },
+  {
+    "id": "landmark_031",
+    "name": "Electronic City General Hospital",
+    "category": "hospital",
+    "location": "Electronic City",
+    "latitude": 12.851655,
+    "longitude": 77.64644
+  },
+  {
+    "id": "landmark_032",
+    "name": "Electronic City Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Electronic City",
+    "latitude": 12.859197,
+    "longitude": 77.663256
+  },
+  {
+    "id": "landmark_033",
+    "name": "Electronic City Public School",
+    "category": "school",
+    "location": "Electronic City",
+    "latitude": 12.832709,
+    "longitude": 77.649015
+  },
+  {
+    "id": "landmark_034",
+    "name": "Electronic City Metro Station",
+    "category": "metro",
+    "location": "Electronic City",
+    "latitude": 12.832787,
+    "longitude": 77.665144
+  },
+  {
+    "id": "landmark_035",
+    "name": "Electronic City Tech Park",
+    "category": "office_hub",
+    "location": "Electronic City",
+    "latitude": 12.834823,
+    "longitude": 77.669424
+  },
+  {
+    "id": "landmark_036",
+    "name": "Electronic City Central Mall",
+    "category": "mall",
+    "location": "Electronic City",
+    "latitude": 12.833468,
+    "longitude": 77.661256
+  },
+  {
+    "id": "landmark_037",
+    "name": "Sarjapur Road General Hospital",
+    "category": "hospital",
+    "location": "Sarjapur Road",
+    "latitude": 12.899292,
+    "longitude": 77.673539
+  },
+  {
+    "id": "landmark_038",
+    "name": "Sarjapur Road Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Sarjapur Road",
+    "latitude": 12.886076,
+    "longitude": 77.699506
+  },
+  {
+    "id": "landmark_039",
+    "name": "Sarjapur Road Public School",
+    "category": "school",
+    "location": "Sarjapur Road",
+    "latitude": 12.915298,
+    "longitude": 77.67613
+  },
+  {
+    "id": "landmark_040",
+    "name": "Sarjapur Road Metro Station",
+    "category": "metro",
+    "location": "Sarjapur Road",
+    "latitude": 12.908038,
+    "longitude": 77.702075
+  },
+  {
+    "id": "landmark_041",
+    "name": "Sarjapur Road Tech Park",
+    "category": "office_hub",
+    "location": "Sarjapur Road",
+    "latitude": 12.913115,
+    "longitude": 77.698951
+  },
+  {
+    "id": "landmark_042",
+    "name": "Sarjapur Road Central Mall",
+    "category": "mall",
+    "location": "Sarjapur Road",
+    "latitude": 12.896129,
+    "longitude": 77.693918
+  },
+  {
+    "id": "landmark_043",
+    "name": "JP Nagar General Hospital",
+    "category": "hospital",
+    "location": "JP Nagar",
+    "latitude": 12.907643,
+    "longitude": 77.60372
+  },
+  {
+    "id": "landmark_044",
+    "name": "JP Nagar Multispecialty Hospital",
+    "category": "hospital",
+    "location": "JP Nagar",
+    "latitude": 12.913791,
+    "longitude": 77.600911
+  },
+  {
+    "id": "landmark_045",
+    "name": "JP Nagar Public School",
+    "category": "school",
+    "location": "JP Nagar",
+    "latitude": 12.918416,
+    "longitude": 77.587168
+  },
+  {
+    "id": "landmark_046",
+    "name": "JP Nagar Metro Station",
+    "category": "metro",
+    "location": "JP Nagar",
+    "latitude": 12.914071,
+    "longitude": 77.578389
+  },
+  {
+    "id": "landmark_047",
+    "name": "JP Nagar Tech Park",
+    "category": "office_hub",
+    "location": "JP Nagar",
+    "latitude": 12.898883,
+    "longitude": 77.603697
+  },
+  {
+    "id": "landmark_048",
+    "name": "JP Nagar Central Mall",
+    "category": "mall",
+    "location": "JP Nagar",
+    "latitude": 12.90484,
+    "longitude": 77.596151
+  },
+  {
+    "id": "landmark_049",
+    "name": "Jayanagar General Hospital",
+    "category": "hospital",
+    "location": "Jayanagar",
+    "latitude": 12.933069,
+    "longitude": 77.57661
+  },
+  {
+    "id": "landmark_050",
+    "name": "Jayanagar Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Jayanagar",
+    "latitude": 12.93339,
+    "longitude": 77.596174
+  },
+  {
+    "id": "landmark_051",
+    "name": "Jayanagar Public School",
+    "category": "school",
+    "location": "Jayanagar",
+    "latitude": 12.92562,
+    "longitude": 77.57921
+  },
+  {
+    "id": "landmark_052",
+    "name": "Jayanagar Metro Station",
+    "category": "metro",
+    "location": "Jayanagar",
+    "latitude": 12.921374,
+    "longitude": 77.574135
+  },
+  {
+    "id": "landmark_053",
+    "name": "Jayanagar Tech Park",
+    "category": "office_hub",
+    "location": "Jayanagar",
+    "latitude": 12.940621,
+    "longitude": 77.589986
+  },
+  {
+    "id": "landmark_054",
+    "name": "Jayanagar Central Mall",
+    "category": "mall",
+    "location": "Jayanagar",
+    "latitude": 12.94475,
+    "longitude": 77.58889
+  },
+  {
+    "id": "landmark_055",
+    "name": "Hebbal General Hospital",
+    "category": "hospital",
+    "location": "Hebbal",
+    "latitude": 13.049565,
+    "longitude": 77.588658
+  },
+  {
+    "id": "landmark_056",
+    "name": "Hebbal Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Hebbal",
+    "latitude": 13.026434,
+    "longitude": 77.588496
+  },
+  {
+    "id": "landmark_057",
+    "name": "Hebbal Public School",
+    "category": "school",
+    "location": "Hebbal",
+    "latitude": 13.032313,
+    "longitude": 77.611688
+  },
+  {
+    "id": "landmark_058",
+    "name": "Hebbal Metro Station",
+    "category": "metro",
+    "location": "Hebbal",
+    "latitude": 13.027546,
+    "longitude": 77.59575
+  },
+  {
+    "id": "landmark_059",
+    "name": "Hebbal Tech Park",
+    "category": "office_hub",
+    "location": "Hebbal",
+    "latitude": 13.022637,
+    "longitude": 77.582816
+  },
+  {
+    "id": "landmark_060",
+    "name": "Hebbal Central Mall",
+    "category": "mall",
+    "location": "Hebbal",
+    "latitude": 13.037174,
+    "longitude": 77.600397
+  },
+  {
+    "id": "landmark_061",
+    "name": "Yelahanka General Hospital",
+    "category": "hospital",
+    "location": "Yelahanka",
+    "latitude": 13.101025,
+    "longitude": 77.60874
+  },
+  {
+    "id": "landmark_062",
+    "name": "Yelahanka Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Yelahanka",
+    "latitude": 13.11153,
+    "longitude": 77.609834
+  },
+  {
+    "id": "landmark_063",
+    "name": "Yelahanka Public School",
+    "category": "school",
+    "location": "Yelahanka",
+    "latitude": 13.103068,
+    "longitude": 77.589205
+  },
+  {
+    "id": "landmark_064",
+    "name": "Yelahanka Metro Station",
+    "category": "metro",
+    "location": "Yelahanka",
+    "latitude": 13.089598,
+    "longitude": 77.604227
+  },
+  {
+    "id": "landmark_065",
+    "name": "Yelahanka Tech Park",
+    "category": "office_hub",
+    "location": "Yelahanka",
+    "latitude": 13.090338,
+    "longitude": 77.581483
+  },
+  {
+    "id": "landmark_066",
+    "name": "Yelahanka Central Mall",
+    "category": "mall",
+    "location": "Yelahanka",
+    "latitude": 13.106677,
+    "longitude": 77.585036
+  },
+  {
+    "id": "landmark_067",
+    "name": "Bannerghatta Road General Hospital",
+    "category": "hospital",
+    "location": "Bannerghatta Road",
+    "latitude": 12.888173,
+    "longitude": 77.58853
+  },
+  {
+    "id": "landmark_068",
+    "name": "Bannerghatta Road Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Bannerghatta Road",
+    "latitude": 12.882253,
+    "longitude": 77.582942
+  },
+  {
+    "id": "landmark_069",
+    "name": "Bannerghatta Road Public School",
+    "category": "school",
+    "location": "Bannerghatta Road",
+    "latitude": 12.880784,
+    "longitude": 77.592351
+  },
+  {
+    "id": "landmark_070",
+    "name": "Bannerghatta Road Metro Station",
+    "category": "metro",
+    "location": "Bannerghatta Road",
+    "latitude": 12.877334,
+    "longitude": 77.586516
+  },
+  {
+    "id": "landmark_071",
+    "name": "Bannerghatta Road Tech Park",
+    "category": "office_hub",
+    "location": "Bannerghatta Road",
+    "latitude": 12.886769,
+    "longitude": 77.603277
+  },
+  {
+    "id": "landmark_072",
+    "name": "Bannerghatta Road Central Mall",
+    "category": "mall",
+    "location": "Bannerghatta Road",
+    "latitude": 12.875491,
+    "longitude": 77.583815
+  },
+  {
+    "id": "landmark_073",
+    "name": "Bellandur General Hospital",
+    "category": "hospital",
+    "location": "Bellandur",
+    "latitude": 12.918747,
+    "longitude": 77.68438
+  },
+  {
+    "id": "landmark_074",
+    "name": "Bellandur Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Bellandur",
+    "latitude": 12.918898,
+    "longitude": 77.682825
+  },
+  {
+    "id": "landmark_075",
+    "name": "Bellandur Public School",
+    "category": "school",
+    "location": "Bellandur",
+    "latitude": 12.912907,
+    "longitude": 77.6845
+  },
+  {
+    "id": "landmark_076",
+    "name": "Bellandur Metro Station",
+    "category": "metro",
+    "location": "Bellandur",
+    "latitude": 12.914967,
+    "longitude": 77.670099
+  },
+  {
+    "id": "landmark_077",
+    "name": "Bellandur Tech Park",
+    "category": "office_hub",
+    "location": "Bellandur",
+    "latitude": 12.932588,
+    "longitude": 77.677652
+  },
+  {
+    "id": "landmark_078",
+    "name": "Bellandur Central Mall",
+    "category": "mall",
+    "location": "Bellandur",
+    "latitude": 12.929911,
+    "longitude": 77.671982
+  },
+  {
+    "id": "landmark_079",
+    "name": "Hennur General Hospital",
+    "category": "hospital",
+    "location": "Hennur",
+    "latitude": 13.040954,
+    "longitude": 77.632871
+  },
+  {
+    "id": "landmark_080",
+    "name": "Hennur Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Hennur",
+    "latitude": 13.035328,
+    "longitude": 77.637222
+  },
+  {
+    "id": "landmark_081",
+    "name": "Hennur Public School",
+    "category": "school",
+    "location": "Hennur",
+    "latitude": 13.048267,
+    "longitude": 77.646467
+  },
+  {
+    "id": "landmark_082",
+    "name": "Hennur Metro Station",
+    "category": "metro",
+    "location": "Hennur",
+    "latitude": 13.037355,
+    "longitude": 77.649261
+  },
+  {
+    "id": "landmark_083",
+    "name": "Hennur Tech Park",
+    "category": "office_hub",
+    "location": "Hennur",
+    "latitude": 13.039202,
+    "longitude": 77.645614
+  },
+  {
+    "id": "landmark_084",
+    "name": "Hennur Central Mall",
+    "category": "mall",
+    "location": "Hennur",
+    "latitude": 13.036441,
+    "longitude": 77.641153
+  },
+  {
+    "id": "landmark_085",
+    "name": "Rajajinagar General Hospital",
+    "category": "hospital",
+    "location": "Rajajinagar",
+    "latitude": 12.982911,
+    "longitude": 77.565522
+  },
+  {
+    "id": "landmark_086",
+    "name": "Rajajinagar Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Rajajinagar",
+    "latitude": 12.995677,
+    "longitude": 77.562187
+  },
+  {
+    "id": "landmark_087",
+    "name": "Rajajinagar Public School",
+    "category": "school",
+    "location": "Rajajinagar",
+    "latitude": 12.994691,
+    "longitude": 77.538345
+  },
+  {
+    "id": "landmark_088",
+    "name": "Rajajinagar Metro Station",
+    "category": "metro",
+    "location": "Rajajinagar",
+    "latitude": 12.979745,
+    "longitude": 77.564054
+  },
+  {
+    "id": "landmark_089",
+    "name": "Rajajinagar Tech Park",
+    "category": "office_hub",
+    "location": "Rajajinagar",
+    "latitude": 12.997489,
+    "longitude": 77.564732
+  },
+  {
+    "id": "landmark_090",
+    "name": "Rajajinagar Central Mall",
+    "category": "mall",
+    "location": "Rajajinagar",
+    "latitude": 13.003305,
+    "longitude": 77.544541
+  },
+  {
+    "id": "landmark_091",
+    "name": "Malleswaram General Hospital",
+    "category": "hospital",
+    "location": "Malleswaram",
+    "latitude": 13.018055,
+    "longitude": 77.574221
+  },
+  {
+    "id": "landmark_092",
+    "name": "Malleswaram Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Malleswaram",
+    "latitude": 13.010401,
+    "longitude": 77.571398
+  },
+  {
+    "id": "landmark_093",
+    "name": "Malleswaram Public School",
+    "category": "school",
+    "location": "Malleswaram",
+    "latitude": 12.996187,
+    "longitude": 77.570481
+  },
+  {
+    "id": "landmark_094",
+    "name": "Malleswaram Metro Station",
+    "category": "metro",
+    "location": "Malleswaram",
+    "latitude": 13.002362,
+    "longitude": 77.564817
+  },
+  {
+    "id": "landmark_095",
+    "name": "Malleswaram Tech Park",
+    "category": "office_hub",
+    "location": "Malleswaram",
+    "latitude": 12.998754,
+    "longitude": 77.569185
+  },
+  {
+    "id": "landmark_096",
+    "name": "Malleswaram Central Mall",
+    "category": "mall",
+    "location": "Malleswaram",
+    "latitude": 12.996502,
+    "longitude": 77.56008
+  },
+  {
+    "id": "landmark_097",
+    "name": "Kanakapura Road General Hospital",
+    "category": "hospital",
+    "location": "Kanakapura Road",
+    "latitude": 12.87883,
+    "longitude": 77.540245
+  },
+  {
+    "id": "landmark_098",
+    "name": "Kanakapura Road Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Kanakapura Road",
+    "latitude": 12.865645,
+    "longitude": 77.553003
+  },
+  {
+    "id": "landmark_099",
+    "name": "Kanakapura Road Public School",
+    "category": "school",
+    "location": "Kanakapura Road",
+    "latitude": 12.875648,
+    "longitude": 77.542925
+  },
+  {
+    "id": "landmark_100",
+    "name": "Kanakapura Road Metro Station",
+    "category": "metro",
+    "location": "Kanakapura Road",
+    "latitude": 12.863989,
+    "longitude": 77.55338
+  },
+  {
+    "id": "landmark_101",
+    "name": "Kanakapura Road Tech Park",
+    "category": "office_hub",
+    "location": "Kanakapura Road",
+    "latitude": 12.861799,
+    "longitude": 77.54339
+  },
+  {
+    "id": "landmark_102",
+    "name": "Kanakapura Road Central Mall",
+    "category": "mall",
+    "location": "Kanakapura Road",
+    "latitude": 12.865933,
+    "longitude": 77.559345
+  },
+  {
+    "id": "landmark_103",
+    "name": "Devanahalli General Hospital",
+    "category": "hospital",
+    "location": "Devanahalli",
+    "latitude": 13.235897,
+    "longitude": 77.716703
+  },
+  {
+    "id": "landmark_104",
+    "name": "Devanahalli Multispecialty Hospital",
+    "category": "hospital",
+    "location": "Devanahalli",
+    "latitude": 13.244515,
+    "longitude": 77.700359
+  },
+  {
+    "id": "landmark_105",
+    "name": "Devanahalli Public School",
+    "category": "school",
+    "location": "Devanahalli",
+    "latitude": 13.234146,
+    "longitude": 77.725478
+  },
+  {
+    "id": "landmark_106",
+    "name": "Devanahalli Metro Station",
+    "category": "metro",
+    "location": "Devanahalli",
+    "latitude": 13.252361,
+    "longitude": 77.705306
+  },
+  {
+    "id": "landmark_107",
+    "name": "Devanahalli Tech Park",
+    "category": "office_hub",
+    "location": "Devanahalli",
+    "latitude": 13.234057,
+    "longitude": 77.727052
+  },
+  {
+    "id": "landmark_108",
+    "name": "Devanahalli Central Mall",
+    "category": "mall",
+    "location": "Devanahalli",
+    "latitude": 13.24636,
+    "longitude": 77.720391
+  }
+]
