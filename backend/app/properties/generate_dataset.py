@@ -38,7 +38,7 @@ AMENITY_POOL = [
     "pool", "gym", "park", "clubhouse", "security", "power_backup", "lift",
     "children_play_area", "jogging_track", "indoor_games", "tennis_court",
     "badminton_court", "yoga_deck", "co_working_space", "amphitheater",
-    "pet_park",
+    "pet_park", "parking",
 ]
 
 # Named landmarks used by find_nearby_places(); a handful per locality area,
