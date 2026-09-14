@@ -159,18 +159,30 @@ def find_date_mentions(text: str, reference: tuple[int, int] = (2026, 9)) -> lis
     lowered = text.lower()
     mentions: list[DateMention] = []
 
-    # "within N months" / "within a year" / "within six months"
+    # "within N months" / "in N months" / "within a year" / "in six months"
     _qty_words = {
         "a": 1, "an": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
         "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12,
     }
     qty_alt = "|".join(sorted(_qty_words.keys(), key=len, reverse=True) + [r"\d+"])
-    for m in re.finditer(rf"within\s+({qty_alt})\s+(month|months|year|years)", lowered):
+    for m in re.finditer(rf"(?:within|in)\s+({qty_alt})\s+(month|months|year|years)", lowered):
         qty_raw, unit = m.group(1), m.group(2)
         qty = _qty_words[qty_raw] if qty_raw in _qty_words else int(qty_raw)
         months = qty if "month" in unit else qty * 12
         y, mo = _add_months(ref_year, ref_month, months)
         mentions.append(DateMention(f"{y:04d}-{mo:02d}", approx=False, confidence=0.85, span=m.span()))
+
+    # ISO-ish "2030-05" / "2030/05"
+    for m in re.finditer(r"\b(20\d{2})[-/](0[1-9]|1[0-2])\b", lowered):
+        year, month = int(m.group(1)), int(m.group(2))
+        mentions.append(DateMention(f"{year:04d}-{month:02d}", approx=False, confidence=0.9, span=m.span()))
+
+    # Bare year, e.g. "2030" with no month given — treat as "by end of that
+    # year" but mark it clearly approximate/low-confidence since the buyer
+    # hasn't actually committed to a month.
+    for m in re.finditer(r"\b(20[2-9]\d)\b", lowered):
+        year = int(m.group(1))
+        mentions.append(DateMention(f"{year:04d}-12", approx=True, confidence=0.55, span=m.span()))
 
     # "before Diwali [this year|next year]" / "before Diwali"
     for m in re.finditer(r"before\s+diwali(?:\s+(this|next)\s+year)?", lowered):
@@ -188,7 +200,7 @@ def find_date_mentions(text: str, reference: tuple[int, int] = (2026, 9)) -> lis
     # "before <Month> <year>" / "by <Month> <year>" / explicit "<Month> <year>"
     month_pattern = "|".join(sorted(MONTH_NAMES.keys(), key=len, reverse=True))
     for m in re.finditer(
-        rf"(before|by|around|in)?\s*({month_pattern})\.?\s*(\d{{4}})?", lowered
+        rf"(before|by|around|in)?\s*\b({month_pattern})\b\.?\s*(\d{{4}})?", lowered
     ):
         qualifier, month_name, year_str = m.group(1), m.group(2), m.group(3)
         month = MONTH_NAMES[month_name]

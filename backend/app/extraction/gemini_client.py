@@ -22,7 +22,7 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-_MODEL_NAME = "gemini-2.0-flash"
+_MODEL_NAME = "gemini-3.6-flash"
 
 _SYSTEM_INSTRUCTION = """You extract structured real-estate buyer constraints from one \
 spoken utterance in an ongoing conversation. You are a supporting signal, not the source \
@@ -36,7 +36,8 @@ Return a JSON array of updates. Each update is an object:
                     "office_location", "hospital_access", "buyer_commute", "floor_preference",
                     "parking", "builder_preference", "amenities"],
   "value": the extracted value (string, number, boolean, or list of strings for amenities;
-            for hospital_access/buyer_commute use one of "low", "medium", "high"),
+            for hospital_access/buyer_commute use exactly one of "low", "medium", "high";
+            for purpose use exactly one of "self_use", "investment" — no other spelling),
   "confidence": 0.0-1.0,
   "type": one of ["hard", "soft", "preference", "context"],
   "is_correction": true if the buyer is explicitly revising a prior statement

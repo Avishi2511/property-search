@@ -131,3 +131,38 @@ def test_date_explicit_month_year():
     mentions = find_date_mentions("before June 2028", reference=(2026, 9))
     assert mentions[0].year_month == "2028-06"
     assert mentions[0].approx is False
+
+
+def test_date_in_n_months_phrasing():
+    mentions = find_date_mentions("I need it in six months", reference=(2026, 9))
+    assert len(mentions) == 1
+    assert mentions[0].year_month == "2027-03"
+
+
+def test_date_iso_style():
+    mentions = find_date_mentions("possession by 2030-05", reference=(2026, 9))
+    assert any(m.year_month == "2030-05" for m in mentions)
+
+
+def test_date_bare_year_is_approximate_and_low_confidence():
+    mentions = find_date_mentions("maybe around 2030", reference=(2026, 9))
+    assert len(mentions) == 1
+    assert mentions[0].year_month == "2030-12"
+    assert mentions[0].approx is True
+    assert mentions[0].confidence < 0.6
+
+
+def test_date_maybe_not_misread_as_month_may():
+    """Regression: 'maybe' contains 'may' as a substring; the month matcher
+    must not fire on it without a word boundary."""
+    mentions = find_date_mentions("maybe around 2030", reference=(2026, 9))
+    assert len(mentions) == 1
+    assert mentions[0].year_month == "2030-12"
+
+
+def test_date_bare_year_suppressed_when_part_of_explicit_month_year():
+    """A bare-year match inside 'before June 2028' must not also produce a
+    separate, lower-confidence Dec-2028 mention."""
+    mentions = find_date_mentions("before June 2028", reference=(2026, 9))
+    assert len(mentions) == 1
+    assert mentions[0].year_month == "2028-06"
