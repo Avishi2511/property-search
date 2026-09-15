@@ -78,6 +78,21 @@ _FLOOR_LOW_RE = re.compile(r"lower floor|ground floor|lower floors", re.IGNORECA
 
 _VALID_TYPES = {"hard", "soft", "preference", "context"}
 
+# Fields where the bot's question is genuinely yes/no-shaped, so a bare
+# affirmative/negative reply can be resolved with no keyword restatement at
+# all -- but only when we know that's the field being answered (pending_field).
+_BOOLEAN_FIELDS = {"parking", "parents_living_with_buyer"}
+
+_AFFIRMATIVE_WORD = r"(?:yes|yeah|yep|yup|sure|of course|definitely|absolutely|correct|right)"
+_NEGATIVE_WORD = (
+    r"(?:no|nope|nah|not really|don'?t need (?:it|that|one)|do not need (?:it|that|one)|"
+    r"no need|not needed)"
+)
+_AFFIRMATIVE_RE = re.compile(
+    rf"^\s*{_AFFIRMATIVE_WORD}(?:[\s,.!]+{_AFFIRMATIVE_WORD})*[\s,.!]*$", re.IGNORECASE
+)
+_NEGATIVE_RE = re.compile(rf"^\s*{_NEGATIVE_WORD}(?:[\s,.!]+{_NEGATIVE_WORD})*[\s,.!]*$", re.IGNORECASE)
+
 
 def _match_locality(text: str) -> str | None:
     lowered = text.lower()
@@ -93,7 +108,9 @@ def profile_summary(profile: BuyerProfile) -> dict:
             for field, c in profile.constraints.items()}
 
 
-def _rule_based_updates(utterance: str, profile: BuyerProfile) -> list[ConstraintUpdate]:
+def _rule_based_updates(
+    utterance: str, profile: BuyerProfile, pending_field: str | None = None
+) -> list[ConstraintUpdate]:
     updates: list[ConstraintUpdate] = []
     lowered = utterance.lower()
     is_correction = bool(_CORRECTION_RE.search(utterance))
@@ -181,6 +198,21 @@ def _rule_based_updates(utterance: str, profile: BuyerProfile) -> list[Constrain
     elif _PARKING_YES_RE.search(utterance):
         updates.append(ConstraintUpdate(field="parking", value=True, confidence=0.85, type="preference"))
 
+    # A bare "yes"/"no" (or "yeah", "nope", "yes yes", ...) only means
+    # anything in light of what was just asked -- it doesn't restate the
+    # field's own keywords, so it can't be picked up by any of the
+    # keyword-specific regexes above. Resolve it directly against
+    # `pending_field` when that field is yes/no-shaped and nothing more
+    # specific already matched it this turn.
+    if (
+        pending_field in _BOOLEAN_FIELDS
+        and pending_field not in {u.field for u in updates}
+    ):
+        if _AFFIRMATIVE_RE.match(utterance):
+            updates.append(ConstraintUpdate(field=pending_field, value=True, confidence=0.9, type="preference"))
+        elif _NEGATIVE_RE.match(utterance):
+            updates.append(ConstraintUpdate(field=pending_field, value=False, confidence=0.9, type="preference"))
+
     found_amenities = [
         canonical for canonical, keywords in _AMENITY_KEYWORDS.items()
         if any(re.search(rf"\b{re.escape(kw)}\b", lowered) for kw in keywords)
@@ -196,8 +228,19 @@ def _rule_based_updates(utterance: str, profile: BuyerProfile) -> list[Constrain
     return updates
 
 
-def _llm_updates(utterance: str, profile: BuyerProfile, already_covered: set[str]) -> list[ConstraintUpdate]:
-    raw = extract_constraints_llm(utterance, profile_summary(profile))
+def _llm_updates(
+    utterance: str,
+    profile: BuyerProfile,
+    already_covered: set[str],
+    pending_field: str | None,
+    pending_question_text: str | None,
+) -> list[ConstraintUpdate]:
+    raw = extract_constraints_llm(
+        utterance,
+        profile_summary(profile),
+        pending_field=pending_field,
+        pending_question_text=pending_question_text,
+    )
     updates = []
     for item in raw:
         field = item.get("field")
@@ -219,11 +262,35 @@ def _llm_updates(utterance: str, profile: BuyerProfile, already_covered: set[str
     return updates
 
 
-def extract(utterance: str, profile: BuyerProfile) -> list[ConstraintUpdate]:
+def extract(
+    utterance: str,
+    profile: BuyerProfile,
+    pending_field: str | None = None,
+    pending_question_text: str | None = None,
+) -> list[ConstraintUpdate]:
     """Returns the list of ConstraintUpdates found in `utterance`, ready to be
     applied via `apply_constraint_update` for each one.
+
+    `pending_field`/`pending_question_text` describe the question the bot
+    just asked (if any), so a short, contextless reply like "yes" or "that
+    works" can be resolved against the field it's actually answering rather
+    than requiring the buyer to restate the field's own keywords.
     """
-    rule_updates = _rule_based_updates(utterance, profile)
+    rule_updates = _rule_based_updates(utterance, profile, pending_field)
     covered_fields = {u.field for u in rule_updates}
-    llm_updates = _llm_updates(utterance, profile, covered_fields)
+    llm_updates = _llm_updates(utterance, profile, covered_fields, pending_field, pending_question_text)
+
+    # Defense in depth: even with prompt guidance, a small/fast model can
+    # still resolve a pending "locality" question onto a place this same
+    # utterance already named as someone else's office (e.g. "my wife's
+    # office is in Koramangala") — the exact office/locality conflation the
+    # rule-based path guards against above. Deterministically drop an
+    # LLM-sourced locality that duplicates this turn's own office_location.
+    office_update = next((u for u in rule_updates if u.field == "office_location"), None)
+    if office_update is not None:
+        llm_updates = [
+            u for u in llm_updates
+            if not (u.field == "locality" and u.value == office_update.value)
+        ]
+
     return rule_updates + llm_updates

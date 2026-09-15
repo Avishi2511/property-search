@@ -22,7 +22,7 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-_MODEL_NAME = "gemini-3.6-flash"
+_MODEL_NAME = "gemini-2.5-flash-lite"
 
 _SYSTEM_INSTRUCTION = """You extract structured real-estate buyer constraints from one \
 spoken utterance in an ongoing conversation. You are a supporting signal, not the source \
@@ -44,6 +44,23 @@ Return a JSON array of updates. Each update is an object:
                     (e.g. "actually", "I said X but", "no, I meant"), else false
 }
 
+You may be told which question the bot just asked, and which field it's about. A
+short, context-only reply ("yes", "nah", "that works", "doesn't matter to me",
+"the second one", "sure, that's fine") means nothing on its own — it only makes
+sense as an answer to that pending question. When you're given that context, resolve
+such SHORT, otherwise-meaningless replies against the pending field (e.g. "yes"/"sure"
+after "Do you need dedicated parking?" -> {"field": "parking", "value": true};
+"doesn't matter" after a hospital-access/commute priority question -> "medium").
+
+Do NOT apply this resolution to a full sentence that already states whose place/value
+it is. "My wife's office is in Koramangala" names Koramangala as the office location —
+that is true regardless of what the pending field was, even if the bot had just asked
+about locality. Only fall back to the pending field when the utterance truly carries no
+attribution of its own.
+
+If the pending field is "budget" or "possession_date", do not answer it yourself even
+from context — omit it, the deterministic system owns those two fields exclusively.
+
 Only include fields the utterance actually gives evidence for. Return [] if there is
 nothing to extract. Return ONLY the JSON array, no other text."""
 
@@ -55,16 +72,32 @@ def _get_model():
     return genai.GenerativeModel(_MODEL_NAME, system_instruction=_SYSTEM_INSTRUCTION)
 
 
-def extract_constraints_llm(utterance: str, profile_summary: dict) -> list[dict]:
+def extract_constraints_llm(
+    utterance: str,
+    profile_summary: dict,
+    pending_field: str | None = None,
+    pending_question_text: str | None = None,
+) -> list[dict]:
     """Returns a list of raw update dicts (field/value/confidence/type/is_correction),
     or [] if Gemini is unavailable or the call fails.
+
+    `pending_field`/`pending_question_text` describe the bot's just-asked
+    question, if any -- needed to resolve short context-only replies like
+    "yes" or "that works" that carry no meaning on their own.
     """
     if not settings.gemini_enabled:
         return []
 
+    pending_context = (
+        f"The bot's last question (still awaiting an answer): \"{pending_question_text}\" "
+        f"(field: \"{pending_field}\")\n\n"
+        if pending_field
+        else ""
+    )
     prompt = (
         f"Current known buyer profile (for context on corrections/references): "
         f"{json.dumps(profile_summary)}\n\n"
+        f"{pending_context}"
         f"Buyer said: \"{utterance}\""
     )
 

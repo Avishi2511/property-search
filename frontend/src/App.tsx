@@ -80,15 +80,64 @@ function App() {
     }
   }
 
+  const totalListings = searchSpace?.history[0] ?? null;
+
   return (
     <div className="app-shell">
-      <header className="app-header">
-        <h1>Voice Search With Progressive Constraint Discovery</h1>
-        <p>The agent decides what to ask next based on what would most narrow your property search.</p>
+      <nav className="navbar">
+        <div className="navbar-inner">
+          <div className="brand">
+            <span className="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+                <path
+                  d="M3 11.5 12 4l9 7.5M5.5 10v9a1 1 0 0 0 1 1H10v-5.5h4V20h3.5a1 1 0 0 0 1-1v-9"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            <span className="brand-name">Basera</span>
+          </div>
+          <div className="navbar-links">
+            <span className="navbar-link navbar-link-active">Talk to Basera</span>
+            <span className="navbar-link">How it works</span>
+          </div>
+          <div className={`connection-pill connection-pill-${status}`}>
+            <span className="connection-dot" />
+            {status === "open" ? "Assistant online" : status === "connecting" ? "Connecting…" : "Disconnected"}
+          </div>
+        </div>
+      </nav>
+
+      <header className="hero">
+        <div className="hero-inner">
+          <p className="hero-eyebrow">Bangalore · voice-first property search</p>
+          <h1>Tell us what home means to you — we'll ask the rest.</h1>
+          <p className="hero-subtitle">
+            No filters to fill in. Just talk — about budget, family, commute, whatever matters — and Basera
+            figures out which question to ask next to find your match fastest.
+          </p>
+          <div className="hero-stats">
+            <div className="hero-stat">
+              <strong>{totalListings ?? "550+"}</strong>
+              <span>listings tracked</span>
+            </div>
+            <div className="hero-stat">
+              <strong>18</strong>
+              <span>Bangalore localities</span>
+            </div>
+            <div className="hero-stat">
+              <strong>{searchSpace ? searchSpace.total_matches : "—"}</strong>
+              <span>matching right now</span>
+            </div>
+          </div>
+        </div>
       </header>
 
       <main className="app-layout">
-        <div className="app-column app-column-left">
+        <aside className="app-sidebar">
           <ConversationPanel
             messages={messages}
             onSend={handleSend}
@@ -102,15 +151,21 @@ function App() {
             voiceEnabled={voiceEnabled}
             onToggleVoiceEnabled={() => setVoiceEnabled((v) => !v)}
           />
-        </div>
+        </aside>
 
-        <div className="app-column app-column-right">
+        <section className="app-main">
+          <div className="status-row">
+            <SearchSpaceFunnel searchSpace={searchSpace} />
+            <NextQuestionExplainer discovery={discovery} />
+          </div>
           <BuyerProfilePanel profile={profile} />
-          <SearchSpaceFunnel searchSpace={searchSpace} />
-          <NextQuestionExplainer discovery={discovery} />
           <TopMatchesPanel matches={topMatches} />
-        </div>
+        </section>
       </main>
+
+      <footer className="app-footer">
+        <p>Basera is a portfolio demo — a voice AI agent that discovers what you actually want, one question at a time.</p>
+      </footer>
     </div>
   );
 }

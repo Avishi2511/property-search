@@ -5,7 +5,7 @@ from app.extraction import extractor
 
 
 def test_llm_updates_fill_gaps_rules_do_not_cover(monkeypatch):
-    monkeypatch.setattr(extractor, "extract_constraints_llm", lambda utterance, summary: [
+    monkeypatch.setattr(extractor, "extract_constraints_llm", lambda utterance, summary, **kwargs: [
         {"field": "purpose", "value": "self_use", "confidence": 0.8, "type": "context"},
     ])
     profile = create_profile("demo-user")
@@ -14,7 +14,7 @@ def test_llm_updates_fill_gaps_rules_do_not_cover(monkeypatch):
 
 
 def test_llm_never_overrides_a_rule_based_field(monkeypatch):
-    monkeypatch.setattr(extractor, "extract_constraints_llm", lambda utterance, summary: [
+    monkeypatch.setattr(extractor, "extract_constraints_llm", lambda utterance, summary, **kwargs: [
         {"field": "bedrooms", "value": 4, "confidence": 0.9, "type": "hard"},
     ])
     profile = create_profile("demo-user")
@@ -24,7 +24,7 @@ def test_llm_never_overrides_a_rule_based_field(monkeypatch):
 
 
 def test_llm_can_never_supply_budget_or_possession_date(monkeypatch):
-    monkeypatch.setattr(extractor, "extract_constraints_llm", lambda utterance, summary: [
+    monkeypatch.setattr(extractor, "extract_constraints_llm", lambda utterance, summary, **kwargs: [
         {"field": "budget", "value": 99_000_000, "confidence": 0.9, "type": "soft"},
         {"field": "possession_date", "value": "2099-01", "confidence": 0.9, "type": "hard"},
     ])
@@ -34,7 +34,7 @@ def test_llm_can_never_supply_budget_or_possession_date(monkeypatch):
 
 
 def test_llm_updates_ignored_for_unknown_field(monkeypatch):
-    monkeypatch.setattr(extractor, "extract_constraints_llm", lambda utterance, summary: [
+    monkeypatch.setattr(extractor, "extract_constraints_llm", lambda utterance, summary, **kwargs: [
         {"field": "not_a_real_field", "value": "x", "confidence": 0.9, "type": "context"},
     ])
     profile = create_profile("demo-user")

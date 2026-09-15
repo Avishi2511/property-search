@@ -26,6 +26,31 @@ export function fieldLabel(field: string): string {
   return FIELD_LABELS[field] ?? field.replace(/_/g, " ");
 }
 
+// Deterministic "listing photo" gradient per property, since we have no real
+// images — a stable hue derived from the id so the same property always
+// looks the same, and neighboring properties still read as visually varied.
+const GRADIENT_PAIRS: [string, string][] = [
+  ["#1e3a5f", "#3b6ea5"],
+  ["#134e4a", "#2f9e8f"],
+  ["#4a2545", "#a55b9e"],
+  ["#5c3d1e", "#c98a3f"],
+  ["#1f3d2b", "#4e9b6a"],
+  ["#3a2647", "#7a4fa8"],
+  ["#4d1f2b", "#b8455f"],
+  ["#1c3a4a", "#4a9ab8"],
+];
+
+function hashString(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+export function thumbnailGradient(id: string): string {
+  const [from, to] = GRADIENT_PAIRS[hashString(id) % GRADIENT_PAIRS.length];
+  return `linear-gradient(135deg, ${from}, ${to})`;
+}
+
 export function formatConstraintValue(field: string, c: ConstraintValue): string {
   if (field === "budget") {
     if (c.min != null && c.max != null) {

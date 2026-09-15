@@ -46,6 +46,28 @@ def test_extract_office_location():
     assert updates["office_location"].value == "Koramangala"
 
 
+def test_office_location_not_misread_as_buyer_locality_even_with_pending_locality_question(monkeypatch):
+    """Regression: when the bot's pending question was about locality, a
+    small/fast LLM can over-eagerly resolve any mentioned place onto it —
+    even one the sentence already attributes to someone else's office.
+    This must be filtered out deterministically regardless of what the LLM
+    (real or mocked) returns."""
+    from app.extraction import extractor
+
+    monkeypatch.setattr(extractor, "extract_constraints_llm", lambda *a, **kw: [
+        {"field": "locality", "value": "Koramangala", "confidence": 0.8, "type": "context"},
+    ])
+    profile = create_profile("demo-user")
+    updates = _updates_by_field(extract(
+        "My wife's office is in Koramangala, but my parents will live with us",
+        profile,
+        pending_field="locality",
+        pending_question_text="What area do you need to be reasonably close to?",
+    ))
+    assert updates["office_location"].value == "Koramangala"
+    assert "locality" not in updates
+
+
 def test_office_location_not_misread_as_buyer_locality():
     """Regression: mentioning a place only as someone else's office must not
     also set the buyer's own desired `locality` to that same place."""

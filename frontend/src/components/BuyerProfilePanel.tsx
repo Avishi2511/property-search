@@ -23,24 +23,19 @@ export function BuyerProfilePanel({ profile }: Props) {
 
       {entries.length === 0 && <p className="empty-hint">Nothing known yet — start the conversation.</p>}
 
-      <div className="constraint-list">
+      <div className="requirement-chips">
         {entries.map(([field, c]) => (
-          <div key={field} className="constraint-card">
-            <div className="constraint-card-top">
-              <span className="constraint-label">{fieldLabel(field)}</span>
-              <span className="constraint-type" style={{ color: TYPE_COLORS[c.type] }}>
-                {c.type}
-              </span>
+          <div key={field} className="requirement-chip">
+            <div className="requirement-chip-top">
+              <span className="requirement-dot" style={{ background: TYPE_COLORS[c.type] }} />
+              <span className="requirement-label">{fieldLabel(field)}</span>
             </div>
-            <div className="constraint-value">{formatConstraintValue(field, c)}</div>
+            <div className="requirement-value">{formatConstraintValue(field, c)}</div>
             {c.changed && c.previous !== null && c.previous !== undefined && (
-              <div className="constraint-previous">was: {String(formatPrevious(field, c.previous))}</div>
+              <div className="requirement-previous">was {formatPrevious(field, c.previous)}</div>
             )}
-            <div className="confidence-row">
-              <div className="confidence-bar">
-                <div className="confidence-fill" style={{ width: `${Math.round(c.confidence * 100)}%` }} />
-              </div>
-              <span className="confidence-label">{Math.round(c.confidence * 100)}%</span>
+            <div className="requirement-confidence">
+              <div className="requirement-confidence-fill" style={{ width: `${Math.round(c.confidence * 100)}%` }} />
             </div>
           </div>
         ))}

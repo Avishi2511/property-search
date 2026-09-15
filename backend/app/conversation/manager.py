@@ -35,11 +35,18 @@ class ConversationManager:
         self.profile: BuyerProfile = create_profile(buyer_id)
         self.questions_asked = 0
         self.config = stopping_config
+        # The field (and rendered text) the bot's last question was about, if
+        # any. Threaded into extraction so a short, contextless reply like
+        # "yes" / "nah" / "that works" can be resolved against the question
+        # it's actually answering, instead of requiring the buyer to restate
+        # the field's own keywords.
+        self.pending_field: str | None = None
+        self.pending_question_text: str | None = None
 
     def process_utterance(self, text: str, top_n: int = 5) -> TurnResult:
         turn = begin_turn(self.profile)
 
-        updates = extract(text, self.profile)
+        updates = extract(text, self.profile, self.pending_field, self.pending_question_text)
         applied = [apply_constraint_update(self.profile, u, turn) for u in updates]
 
         criteria = build_search_criteria(self.profile)
@@ -50,6 +57,11 @@ class ConversationManager:
         decision = decide(self.profile, search_result.properties, self.questions_asked, self.config)
         if not decision.should_stop:
             self.questions_asked += 1
+            self.pending_field = decision.next_question.field
+            self.pending_question_text = decision.next_question.question_text
+        else:
+            self.pending_field = None
+            self.pending_question_text = None
 
         response_text = build_response(applied, decision, ranked)
 

@@ -64,15 +64,20 @@ export function ConversationPanel({
           </p>
         )}
         {messages.map((m, i) => (
-          <div key={i} className={`message message-${m.role}`}>
-            <span className="message-badge">{m.role === "buyer" ? "🎙 Buyer" : "🤖 AI"}</span>
-            <p>{m.text}</p>
+          <div key={i} className={`message-row message-row-${m.role}`}>
+            {m.role === "ai" && <span className="avatar avatar-ai">B</span>}
+            <div className={`message message-${m.role}`}>
+              <p>{m.text}</p>
+            </div>
+            {m.role === "buyer" && <span className="avatar avatar-buyer">You</span>}
           </div>
         ))}
         {listening && partialTranscript && (
-          <div className="message message-buyer message-partial">
-            <span className="message-badge">🎙 Buyer (listening…)</span>
-            <p>{partialTranscript}</p>
+          <div className="message-row message-row-buyer">
+            <div className="message message-buyer message-partial">
+              <p>{partialTranscript}</p>
+            </div>
+            <span className="avatar avatar-buyer">You</span>
           </div>
         )}
       </div>
