@@ -97,22 +97,6 @@ flowchart LR
     style Extract fill:#f8f9fa,color:#000,stroke:#adb5bd
 ```
 
-The engine (`conversation → extraction → constraints → discovery → search →
-ranking`) is pure Python with **no dependency on voice** — every behavior
-above is covered by a text-only test. Voice is one interface into it, not
-the architecture.
-
-### Why extraction never trusts the LLM for numbers or dates
-
-`extraction/normalize.py` deterministically parses Indian money phrasing
-(`2 crore`, `₹1.8 Cr`, `under 2 crore`, `one point eight crore`, hesitation
-like *"maybe... 1.8... no, let's say 2"*) and conversational dates
-(*"within six months"*, *"before Diwali next year"*, *"early 2028"*) with
-regex — not an LLM call. `extraction/gemini_client.py` is used only for
-open-ended fields (purpose, priorities, corrections, locality phrasing) and
-is explicitly forbidden — in the prompt *and* as a hard filter in
-`extractor.py` — from ever supplying `budget` or `possession_date`.
-
 ## 🎯 How progressive discovery works
 
 For every still-unanswered (or still-ambiguous) field, `discovery/scorer.py`
@@ -228,42 +212,6 @@ type or click the mic and talk.
 | `GEMINI_API_KEY` | No | Enables LLM-assisted extraction for open-ended phrasing (purpose, priorities, unusual locality references). Without it, the system runs on rule-based extraction alone — weaker on open-ended phrasing, but fully functional and deterministic. Never used for money/dates regardless. |
 | `HOST`, `PORT` | No | Uvicorn bind address, default `0.0.0.0:8000`. |
 
-## ✅ Testing strategy
-
-126 tests in `backend/tests/`, organized by layer: dataset/search filtering,
-constraint state (corrections, confirmations, contradiction-softening),
-deterministic money/date normalization, rule-based + LLM-merge extraction,
-discovery scoring/stopping policy, ranking determinism, the search-criteria
-bridge, the WebSocket API, and full end-to-end conversations against the
-real 550-property dataset — including adversarial cases: corrections,
-out-of-order information, hesitation, contradictions. **Gemini is mocked or
-disabled in every test** — nothing in CI depends on a live API key.
-
-Run everything: `cd backend && pytest -q`.
-
-## ⚠️ Known limitations
-
-- **Voice feedback loop** — without headphones, the mic can pick up the
-  agent's own speaker output. Chrome's default capture applies echo
-  cancellation, which usually prevents false interrupts, but it isn't
-  guaranteed. A production system would route through a dedicated
-  acoustic-echo-cancelling pipeline — exactly why voice sits behind a
-  swappable `VoiceProvider` interface.
-- **Commute estimates** are straight-line distance ÷ an assumed 22 km/h
-  average city speed, not a real routing engine.
-- **Browser support** — voice requires Chrome (`webkitSpeechRecognition`).
-  Other browsers fall back to typing; the UI detects this and messages it.
-- **Gemini model pinning** — `_MODEL_NAME` in `extraction/gemini_client.py`
-  is a fixed model string. If Google deprecates it, extraction logs a
-  warning and falls back to rule-based only rather than failing the
-  request, but the constant will need updating to restore LLM-assisted
-  extraction.
-- **`create-vite` pinned to v5** in the frontend setup instructions — the
-  latest `create-vite` requires Node ≥20; this repo was scaffolded against
-  Node 18. Not an issue once `npm install` has already run (only affects
-  re-scaffolding from scratch).
-- Builder names in the dataset are fictional, to avoid implying any real
-  builder's association with this demo.
 
 ---
 
