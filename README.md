@@ -1,102 +1,152 @@
-# Basera — Voice Search With Progressive Constraint Discovery
+<div align="center">
 
-A voice-first real-estate search agent for Bangalore that progressively
-discovers a buyer's actual requirements through natural conversation.
-Instead of a fixed questionnaire (budget? bedrooms? location? ...), the
-agent decides — after every utterance — which still-unknown piece of
-information would most reduce the property search space, and asks that
-next. It stops asking once it has a small number of strong matches, and
-explains why it picked each question.
+# 🏠 Basera
 
-This is **not** `voice → speech-to-text → chatbot → text-to-speech`. Voice
-is a first-class interface into a discovery engine that maintains a
-structured, confidence-scored buyer profile, handles corrections and
-hesitation, and is fully testable through text alone.
+### Voice-first real-estate search that asks the *right* next question — not the next question on a form
 
-## Status
+[![Backend](https://img.shields.io/badge/backend-FastAPI-009688?logo=fastapi&logoColor=white)](backend)
+[![Frontend](https://img.shields.io/badge/frontend-React%2018%20%2B%20TypeScript-61DAFB?logo=react&logoColor=white)](frontend)
+[![Tests](https://img.shields.io/badge/tests-126%20passing-brightgreen)](backend/tests)
+[![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)](backend)
+[![WebSocket](https://img.shields.io/badge/transport-WebSocket-black)](backend/app/api)
 
-Core engine, real-time voice, and web UI are built and working end-to-end.
-126 backend tests passing. See [Architecture](#architecture) for what each
-piece does and [Known limitations](#known-limitations) for what's
-deliberately left as future work.
+**[Demo flow](#-demo-flow) · [Why this is hard](#-why-this-is-a-hard-problem) · [Architecture](#-architecture) · [How discovery works](#-how-progressive-discovery-works) · [Running it](#-running-it)**
 
-## Demo flow
+</div>
 
+---
+
+Real-estate search UIs make you fill out a form before they'll help you: city,
+budget, bedrooms, locality, possession date — eight fields, in a fixed order,
+before a single result appears. Half of them don't matter for your search;
+the one that matters most is buried at the bottom.
+
+**Basera throws out the form.** A buyer talks, in any order, with
+corrections and hesitation and half-finished thoughts, the way people
+actually describe what they want. After every utterance the backend
+re-evaluates the *entire remaining candidate set* and asks — out loud —
+whichever still-unknown question would cut that set down the most. It stops
+asking as soon as a handful of strong matches remain, and it can explain
+*why* it asked what it asked.
+
+## 🎙 Demo flow
+
+```text
+Buyer   "I want a 3BHK in Bangalore around two crore."
+Basera  → extracts city=Bangalore, bedrooms=3, budget≈₹1.8–2.2Cr
+         → 231 of 550 properties still match
+         → picks "locality" as the next question (~99% expected narrowing)
+
+Buyer   "My wife's office is in Koramangala, but my parents will live with
+         us, so being close to hospitals matters more than my commute."
+Basera  → office_location=Koramangala        (context, not the buyer's locality)
+         → parents_living_with_buyer=true
+         → hospital_access=high, buyer_commute=low
+
+Buyer   "Actually, I can stretch to 2.1 crore."
+Basera  → budget revised: ₹2.0Cr (±10%) → ₹2.1Cr   [correction detected]
+
+  … conversation continues until candidates ≤ 6, then:
+
+Basera  "I've narrowed this down to 5 strong options. Let me walk you
+         through the top matches …"   + ranked listings with match scores
 ```
-Buyer: "I want a 3BHK in Bangalore around two crore."
-  → extracts city=Bangalore, bedrooms=3, budget≈₹1.8–2.2Cr
-  → 231 of 550 properties still match
-  → picks "locality" as the next question (~99% expected narrowing)
 
-Buyer: "My wife's office is in Koramangala, but my parents will live with
-        us, so being close to hospitals matters more than my commute."
-  → office_location=Koramangala (context, NOT the buyer's own locality)
-  → parents_living_with_buyer=true, hospital_access=high, buyer_commute=low
+## 🧩 Why this is a hard problem
 
-Buyer: "Actually, I can stretch to 2.1 crore."
-  → budget updated: previous=₹2.0Cr(±10%), current=₹2.1Cr, changed=true
+| Naive approach | What breaks | What Basera does instead |
+|---|---|---|
+| Fixed questionnaire (budget → bedrooms → locality → …) | Asks questions that are already irrelevant given earlier answers; ignores what the buyer actually cares about | Re-scores **every** unanswered field after every turn and asks the one with the highest expected narrowing |
+| LLM parses everything, including money/dates | Silent unit errors (`2 crore` → `2,00,000`), inconsistent on "under two crore", can't be unit-tested deterministically | Regex/rule-based extraction for money & dates, **structurally forbidden** from ever going through the LLM |
+| Chatbot memory = raw transcript | Can't detect a correction ("actually, 2.1 crore") vs. a new fact; no confidence signal for ranking | Structured `BuyerProfile` with per-field confidence, correction history, and contradiction softening |
 
-... conversation continues until candidates ≤ 6, then:
-  → "I've narrowed this down to N strong options. Let me walk you through
-     the top matches: ..." + ranked listings with a match score.
-```
+## 🏗 Architecture
 
-## Architecture
+```mermaid
+flowchart LR
+    subgraph Browser["Browser — React + TypeScript"]
+        Speech["Web Speech API\n(STT / TTS, barge-in)"]
+        UI["Conversation UI\nbuyer profile · search funnel\nnext-question explainer\nranked listings"]
+        Speech <--> UI
+    end
 
-```
-Browser (React)
- ├─ Web Speech API (STT + TTS), behind a swappable VoiceProvider interface
- ├─ Conversation UI + live buyer profile, search-space funnel, next-question
- │  explainer, and a ranked listings grid
- └─ WebSocket ──────────────────────────────────────────────────┐
-                                                                  │
-FastAPI backend (/ws/conversation)                               │
- ├─ conversation/  turn loop: extract → update state → search → │
- │                 rank → decide (ask or stop) → respond ────────┘
- ├─ extraction/    deterministic money/date parsing + rule-based NLU,
- │                 with Gemini filling gaps for open-ended phrasing only
- ├─ constraints/   BuyerProfile state: corrections, confidence, history
- ├─ discovery/     question bank + heuristic scorer + stopping policy
- ├─ search/        hard-constraint filtering + geo/commute tools
- ├─ ranking/       deterministic weighted soft-preference scoring
- └─ properties/    synthetic Bangalore dataset (550 listings, 18 localities)
+    UI <-->|"WebSocket\n/ws/conversation"| API
+
+    subgraph Backend["FastAPI backend"]
+        API["api/\nWebSocket endpoint"]
+        Conv["conversation/\nturn loop"]
+        Extract["extraction/\nmoney & date regex\n+ Gemini (open-ended only)"]
+        Constraints["constraints/\nBuyerProfile\ncorrections · confidence"]
+        Discovery["discovery/\nentropy scorer\nstop/select policy"]
+        Search["search/\nhard-constraint filter\ngeo & commute tools"]
+        Ranking["ranking/\nweighted soft-preference\nscoring"]
+        Data[("properties/\n550 listings\n18 Bangalore localities")]
+
+        API --> Conv
+        Conv -->|"1. extract"| Extract
+        Conv -->|"2. update state"| Constraints
+        Conv -->|"3. filter"| Search
+        Conv -->|"4. rank"| Ranking
+        Conv -->|"5. ask or stop"| Discovery
+        Search --> Data
+        Discovery -.->|"reads candidate set"| Search
+        Conv -->|"response"| API
+    end
+
+    style Discovery fill:#4c6ef5,color:#fff,stroke:#364fc7
+    style Extract fill:#f8f9fa,color:#000,stroke:#adb5bd
 ```
 
 The engine (`conversation → extraction → constraints → discovery → search →
-ranking`) is pure Python with no dependency on voice — every behavior above
-is covered by a text-only test. Voice is one interface into it, not the
-architecture.
+ranking`) is pure Python with **no dependency on voice** — every behavior
+above is covered by a text-only test. Voice is one interface into it, not
+the architecture.
 
 ### Why extraction never trusts the LLM for numbers or dates
 
 `extraction/normalize.py` deterministically parses Indian money phrasing
 (`2 crore`, `₹1.8 Cr`, `under 2 crore`, `one point eight crore`, hesitation
-like `"maybe... 1.8... no, let's say 2"`) and conversational dates
-(`"within six months"`, `"before Diwali next year"`, `"early 2028"`) with
-regex, not an LLM call. `extraction/gemini_client.py` is used only for
+like *"maybe... 1.8... no, let's say 2"*) and conversational dates
+(*"within six months"*, *"before Diwali next year"*, *"early 2028"*) with
+regex — not an LLM call. `extraction/gemini_client.py` is used only for
 open-ended fields (purpose, priorities, corrections, locality phrasing) and
-is explicitly forbidden — in the prompt *and* in code, as a hard filter in
+is explicitly forbidden — in the prompt *and* as a hard filter in
 `extractor.py` — from ever supplying `budget` or `possession_date`.
 
-### Progressive question selection
+## 🎯 How progressive discovery works
 
-For each still-unanswered (or still-ambiguous) field, `discovery/scorer.py`
-computes:
+For every still-unanswered (or still-ambiguous) field, `discovery/scorer.py`
+computes one number:
 
 ```
 question_score = expected_filter_strength × buyer_relevance × uncertainty × priority
 ```
 
-`expected_filter_strength` is the normalized Shannon entropy of that field's
-distribution across the *current* candidate set — 0 if every remaining
-property already agrees (useless to ask), high if an answer would split the
-set well. `buyer_relevance` adjusts for context already established (e.g.
-hospital access matters more once parents are confirmed to be moving in).
-`discovery/policy.py` picks the highest-scoring question and stops once
-candidates fall below a configurable threshold (default 6), a max-questions
-cap is hit, or no remaining question would help. This is a heuristic by
-design (see the project brief) — `QuestionScorer` is a swappable interface,
-not a fixed algorithm.
+```mermaid
+flowchart TD
+    A["Candidate set after last turn\n(e.g. 231 properties)"] --> B{"For each unanswered field…"}
+    B --> C["expected_filter_strength\nShannon entropy of the field's\nvalue distribution across candidates"]
+    B --> D["buyer_relevance\nadjusted by context already known\n(e.g. parents moving in → hospitals matter)"]
+    B --> E["uncertainty × priority\nhow unsure we are · how important the field is"]
+    C --> F["question_score"]
+    D --> F
+    E --> F
+    F --> G{"Highest-scoring\nquestion"}
+    G -->|"ask it"| H["Buyer answers"]
+    H --> A
+    G -.->|"candidates ≤ 6\nOR max questions hit\nOR no question helps"| I["Stop → present ranked matches"]
+
+    style F fill:#4c6ef5,color:#fff,stroke:#364fc7
+    style I fill:#2f9e44,color:#fff,stroke:#2b8a3e
+```
+
+`expected_filter_strength` is 0 if every remaining property already agrees
+on that field (asking would be useless) and high if an answer would split
+the candidate set cleanly. `discovery/policy.py` picks the highest-scoring
+question each turn and stops once candidates fall below a configurable
+threshold (default 6), a max-questions cap is hit, or no remaining question
+would help. This is a heuristic by design — `QuestionScorer` is a swappable
+interface, not a fixed algorithm.
 
 ### Ranking
 
@@ -104,13 +154,25 @@ not a fixed algorithm.
 locality/commute proximity, possession timeline, amenities, parking, and
 builder preference — weighted, and blended toward "neutral" by each
 constraint's confidence, so a shaky guess influences ranking less than a
-firm statement. Hard constraints are enforced as a filter before ranking
+firm statement. Hard constraints are enforced as a filter *before* ranking
 ever runs (`conversation/search_bridge.py` decides which constraints are
 hard enough to filter vs. soft enough to only affect ordering).
 
-## Project structure
+## 🛠 Tech stack
 
-```
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, TypeScript, Vite |
+| Voice | Web Speech API (STT + TTS) behind a swappable `VoiceProvider` interface |
+| Realtime transport | WebSocket (`/ws/conversation`) |
+| Backend | FastAPI, Pydantic v2, Uvicorn |
+| LLM (optional, gap-filling only) | Google Gemini — never used for money or dates |
+| Testing | pytest, pytest-asyncio, httpx — 126 tests, Gemini mocked/disabled in CI |
+| Dataset | 550 synthetic listings across 18 real Bangalore localities |
+
+## 📁 Project structure
+
+```text
 backend/
   app/
     properties/    synthetic dataset generator + repository + Bangalore localities
@@ -126,14 +188,14 @@ backend/
 frontend/
   src/
     voice/         VoiceProvider interface + WebSpeechProvider (STT/TTS, barge-in)
-    ws/            typed WebSocket client
+    ws/             typed WebSocket client
     components/    ConversationPanel, BuyerProfilePanel, SearchSpaceFunnel,
-                   NextQuestionExplainer, TopMatchesPanel
-    format.ts      Cr/Lakh formatting, field labels, listing thumbnail gradients
-    App.tsx        layout: sticky conversation sidebar + results main area
+                    NextQuestionExplainer, TopMatchesPanel
+    format.ts       Cr/Lakh formatting, field labels, listing thumbnail gradients
+    App.tsx         layout: sticky conversation sidebar + results main area
 ```
 
-## Running it
+## 🚀 Running it
 
 ### Backend
 
@@ -143,7 +205,7 @@ python -m venv venv
 source venv/Scripts/activate   # Windows Git Bash; venv\Scripts\activate.bat on cmd.exe
 pip install -r requirements.txt
 cp .env.example .env           # optionally set GEMINI_API_KEY — see below
-python -m app.properties.generate_dataset   # writes app/properties/data/*.json (already committed, re-run only if you change the generator)
+python -m app.properties.generate_dataset   # writes app/properties/data/*.json (already committed)
 uvicorn app.main:app --reload
 pytest                         # 126 tests
 ```
@@ -166,35 +228,35 @@ type or click the mic and talk.
 | `GEMINI_API_KEY` | No | Enables LLM-assisted extraction for open-ended phrasing (purpose, priorities, unusual locality references). Without it, the system runs on rule-based extraction alone — weaker on open-ended phrasing, but fully functional and deterministic. Never used for money/dates regardless. |
 | `HOST`, `PORT` | No | Uvicorn bind address, default `0.0.0.0:8000`. |
 
-## Testing strategy
+## ✅ Testing strategy
 
 126 tests in `backend/tests/`, organized by layer: dataset/search filtering,
 constraint state (corrections, confirmations, contradiction-softening),
 deterministic money/date normalization, rule-based + LLM-merge extraction,
 discovery scoring/stopping policy, ranking determinism, the search-criteria
 bridge, the WebSocket API, and full end-to-end conversations against the
-real 550-property dataset (including the spec's adversarial cases:
-corrections, out-of-order info, hesitation, contradictions). Gemini is
-mocked or disabled in every test — nothing in CI depends on a live API key.
+real 550-property dataset — including adversarial cases: corrections,
+out-of-order information, hesitation, contradictions. **Gemini is mocked or
+disabled in every test** — nothing in CI depends on a live API key.
 
 Run everything: `cd backend && pytest -q`.
 
-## Known limitations
+## ⚠️ Known limitations
 
-- **Voice feedback loop**: without headphones, the mic can pick up the
-  agent's own speaker output. Chrome's default capture applies some echo
+- **Voice feedback loop** — without headphones, the mic can pick up the
+  agent's own speaker output. Chrome's default capture applies echo
   cancellation, which usually prevents false interrupts, but it isn't
   guaranteed. A production system would route through a dedicated
   acoustic-echo-cancelling pipeline — exactly why voice sits behind a
   swappable `VoiceProvider` interface.
 - **Commute estimates** are straight-line distance ÷ an assumed 22 km/h
   average city speed, not a real routing engine.
-- **Browser support**: voice requires Chrome (`webkitSpeechRecognition`).
-  Other browsers fall back to typing — the UI detects and message this.
-- **Gemini model pinning**: `_MODEL_NAME` in `extraction/gemini_client.py`
-  is a fixed model string; if Google deprecates it, extraction logs a
+- **Browser support** — voice requires Chrome (`webkitSpeechRecognition`).
+  Other browsers fall back to typing; the UI detects this and messages it.
+- **Gemini model pinning** — `_MODEL_NAME` in `extraction/gemini_client.py`
+  is a fixed model string. If Google deprecates it, extraction logs a
   warning and falls back to rule-based only rather than failing the
-  request — but the constant will need updating to restore LLM-assisted
+  request, but the constant will need updating to restore LLM-assisted
   extraction.
 - **`create-vite` pinned to v5** in the frontend setup instructions — the
   latest `create-vite` requires Node ≥20; this repo was scaffolded against
@@ -202,3 +264,11 @@ Run everything: `cd backend && pytest -q`.
   re-scaffolding from scratch).
 - Builder names in the dataset are fictional, to avoid implying any real
   builder's association with this demo.
+
+---
+
+<div align="center">
+
+Built by [Avishi Mittal](https://github.com/Avishi2511)
+
+</div>
